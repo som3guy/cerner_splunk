@@ -25,3 +25,6 @@ bin/*
 # Vagrant-Repo
 vagrant_repo/Berksfile.lock
 vagrant_repo/.chef/syntaxcache
+
+# Test Kitchen directory
+.kitchen/
