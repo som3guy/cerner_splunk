@@ -1,14 +1,16 @@
 # coding: UTF-8
 
 require_relative '../spec_helper'
+require 'recipe'
 
 describe 'cerner_splunk::shc_search_head' do
   subject do
-    runner = ChefSpec::SoloRunner.new(step_into: ['cerner_splunk_sh_cluster']) do |node|
-      node.set['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
-      node.set['splunk']['cmd'] = '/opt/splunk/bin/splunk'
-      node.set['splunk']['package']['base_name'] = 'base_name'
-      node.set['splunk']['package']['download_group'] = 'download_group'
+    runner = ChefSpec::SoloRunner.new(platform: platform, version: platform_version, step_into: ['cerner_splunk_sh_cluster']) do |node|
+      node.override['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
+      node.override['splunk']['cmd'] = '/opt/splunk/bin/splunk'
+      node.override['splunk']['package']['base_name'] = 'base_name'
+      node.override['splunk']['package']['download_group'] = 'download_group'
+      node.override['splunk']['mgmt_host'] = 'host'
     end
     runner.converge('cerner_splunk::_install', described_recipe)
   end
@@ -29,11 +31,17 @@ describe 'cerner_splunk::shc_search_head' do
       ]
     }
   end
+  let(:platform) { 'centos' }
+  let(:platform_version) { '7.6.1804' }
+  let(:rhel) { nil }
+  let(:existing_member) { nil }
 
   before do
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'cluster').and_return(cluster_config)
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'indexes').and_return({})
-    stub_command('/opt/splunk/bin/splunk list shcluster-members -auth admin:changeme | grep 127.0.0.1').and_return(existing_member)
+    allow(ChefVault::Item).to receive(:data_bag_item_type).and_return(:normal)
+    stub_data_bag_item('cerner_splunk', 'cluster').and_return(cluster_config)
+    stub_data_bag_item('cerner_splunk', 'indexes').and_return({})
+    allow(Chef::Recipe).to receive(:platform_family?).with('rhel').and_return(rhel)
+    stub_command('/opt/splunk/bin/splunk list shcluster-members -auth admin:changeme | grep host').and_return(existing_member)
   end
 
   after do
@@ -59,11 +67,12 @@ end
 
 describe 'cerner_splunk::shc_remove_search_head' do
   subject do
-    runner = ChefSpec::SoloRunner.new(step_into: ['cerner_splunk_sh_cluster']) do |node|
-      node.set['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
-      node.set['splunk']['cmd'] = '/opt/splunk/bin/splunk'
-      node.set['splunk']['package']['base_name'] = 'base_name'
-      node.set['splunk']['package']['download_group'] = 'download_group'
+    runner = ChefSpec::SoloRunner.new(platform: platform, version: platform_version, step_into: ['cerner_splunk_sh_cluster']) do |node|
+      node.normal['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
+      node.normal['splunk']['cmd'] = '/opt/splunk/bin/splunk'
+      node.normal['splunk']['mgmt_host'] = 'host'
+      node.normal['splunk']['package']['base_name'] = 'base_name'
+      node.normal['splunk']['package']['download_group'] = 'download_group'
     end
     runner.converge('cerner_splunk::_install', described_recipe)
   end
@@ -85,12 +94,17 @@ describe 'cerner_splunk::shc_remove_search_head' do
     }
   end
 
+  let(:platform) { 'centos' }
+  let(:platform_version) { '7.6.1804' }
   let(:existing_member) { nil }
+  let(:rhel) { nil }
 
   before do
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'cluster').and_return(cluster_config)
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'indexes').and_return({})
-    stub_command('/opt/splunk/bin/splunk list shcluster-members -auth admin:changeme | grep 127.0.0.1').and_return(existing_member)
+    allow(ChefVault::Item).to receive(:data_bag_item_type).and_return(:normal)
+    stub_data_bag_item('cerner_splunk', 'cluster').and_return(cluster_config)
+    stub_data_bag_item('cerner_splunk', 'indexes').and_return({})
+    allow(Chef::Recipe).to receive(:platform_family?).with('rhel').and_return(rhel)
+    stub_command('/opt/splunk/bin/splunk list shcluster-members -auth admin:changeme | grep host').and_return(existing_member)
   end
 
   after do
@@ -116,11 +130,11 @@ end
 
 describe 'cerner_splunk::shc_captain' do
   subject do
-    runner = ChefSpec::SoloRunner.new(step_into: ['cerner_splunk_sh_cluster']) do |node|
-      node.set['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
-      node.set['splunk']['cmd'] = '/opt/splunk/bin/splunk'
-      node.set['splunk']['package']['base_name'] = 'base_name'
-      node.set['splunk']['package']['download_group'] = 'download_group'
+    runner = ChefSpec::SoloRunner.new(platform: platform, version: platform_version, step_into: ['cerner_splunk_sh_cluster']) do |node|
+      node.normal['splunk']['config']['clusters'] = ['cerner_splunk/cluster']
+      node.normal['splunk']['cmd'] = '/opt/splunk/bin/splunk'
+      node.normal['splunk']['package']['base_name'] = 'base_name'
+      node.normal['splunk']['package']['download_group'] = 'download_group'
     end
     runner.converge('cerner_splunk::_install', described_recipe)
   end
@@ -142,11 +156,16 @@ describe 'cerner_splunk::shc_captain' do
     }
   end
 
+  let(:platform) { 'centos' }
+  let(:platform_version) { '7.6.1804' }
   let(:captain_exist) { nil }
+  let(:rhel) { nil }
 
   before do
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'cluster').and_return(cluster_config)
-    allow(Chef::DataBagItem).to receive(:load).with('cerner_splunk', 'indexes').and_return({})
+    allow(ChefVault::Item).to receive(:data_bag_item_type).and_return(:normal)
+    stub_data_bag_item('cerner_splunk', 'cluster').and_return(cluster_config)
+    stub_data_bag_item('cerner_splunk', 'indexes').and_return({})
+    allow(Chef::Recipe).to receive(:platform_family?).with('rhel').and_return(rhel)
     stub_command('/opt/splunk/bin/splunk list shcluster-members -auth admin:changeme | grep is_captain:1').and_return(captain_exist)
   end
 
@@ -166,5 +185,13 @@ describe 'cerner_splunk::shc_captain' do
     it 'does not assign the SH to be the captain' do
       expect(subject).not_to run_execute('Captain assignment')
     end
+  end
+end
+
+describe 'cerner_splunk::shc_search_head' do
+  step_into :cerner_splunk_sh_cluster
+  override_attributes['']
+  recipe do
+    default_attributes['splunk']['mgmt_host'] = nil
   end
 end

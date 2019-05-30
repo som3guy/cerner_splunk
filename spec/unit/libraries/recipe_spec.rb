@@ -137,4 +137,36 @@ describe 'CernerSplunk' do
       end
     end
   end
+
+  describe '.management_host' do
+
+    let(:node) { nil }
+    let(:host_mgmt) { { 'splunk' => { 'mgmt_host' => 'host' } } }
+    let(:addresses) {
+      { '10.0.0.2' => {
+        'broadcast' => '10.0.0.1',
+        'family' => 'inet',
+        'netmask' => '255.255.255.0',
+        'prefixlen' => '24',
+        'scope' => 'Global' }
+      }
+    }
+    subject { CernerSplunk.management_host(node) }
+
+    context 'when host has a node vaule' do
+      let(:node) { host_mgmt }
+      it 'expects to match the value' do
+        expect(subject).to eq('host')
+      end
+    end
+
+    context 'when mgmt_host is not set' do
+      let(:node) { addresses }
+
+      it 'expects to use address hash to find a vaule' do
+        expect(subject).to eq('10.0.0.1')
+      end
+    end
+
+  end
 end
