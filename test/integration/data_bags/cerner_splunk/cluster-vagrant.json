@@ -34,6 +34,6 @@
     "shcluster_label": "main-cluster",
     "pass4SymmKey": "$1$4SvBVSpNjhiY51BIRp6C3urG7YJU"
   },
-  "indexes" : "cerner_splunk/indexes-vagrant",
+  "indexes" : "cerner_splunk/indexes-kitchen",
   "apps": "cerner_splunk/cluster-apps-vagrant"
 }

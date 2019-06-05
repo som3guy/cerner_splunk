@@ -2,5 +2,8 @@
   "name": "test_splunk",
   "description": "Environment for the Splunk server",
   "default_attributes": {
+    "chef-vault": {
+      "databag_fallback": true
+    }
   }
 }

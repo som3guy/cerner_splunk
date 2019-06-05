@@ -22,7 +22,7 @@
       "maxDataSize": "auto",
       "maxMemMB": 1
     },
-    "opsinfra" : { "_volume": "foo" },
+    "testIndex" : { "_volume": "foo" },
     "pop_health" : { "_volume": "bar" },
     "bobs_index_emporium": {},
     "calculated_max_total": { "_maxDailyDataSizeMB": 50 },

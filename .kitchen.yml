@@ -25,10 +25,8 @@ platforms:
 suites:
 - name: s_standalone
   driver:
+    vm_hostname: s-standalone
     network:
       - ['private_network', {ip: '33.33.33.20'}]
   run_list:
   - role[s_standalone]
-  attributes:
-    chef-vault:
-      databag_fallback: true
